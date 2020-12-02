@@ -9,7 +9,7 @@ const mainMenu = () => {
     type: 'list',
     name: 'action',
     message: 'What would you like to do?',
-    choices: ['View Database Tables', 'Add to Database', 'Update Employee Role','EXIT']
+    choices: ['View Database Tables', 'Add to Database', 'Update Employee Role', 'EXIT']
   })
     .then(({ action }) => {
       switch (action) {
@@ -46,10 +46,10 @@ const viewDataBase = () => {
           viewRoles()
           break
         case 'View Employees':
-          // viewEmployees()
+          viewEmployees()
           break
         case 'Return to Main Menu':
-        mainMenu()
+          mainMenu()
           break
       }
     })
@@ -82,48 +82,50 @@ const addToDataBase = () => {
     .catch(err => console.log(err))
 }
 
-const viewDepartments = () => {db.query('SELECT name AS Department FROM departments', (err, departments) => {
-  if (err) { console.log(err) }
-  console.table(departments)
-  mainMenu()
-})
+const viewDepartments = () => {
+  db.query('SELECT name AS Department FROM departments', (err, departments) => {
+    if (err) { console.log(err) }
+    console.table(departments)
+    mainMenu()
+  })
 }
 
 const viewRoles = () => {
-  db.query('SELECT * FROM roles', (err, roles) => {
-    if (err) { console.log(err) }
-    console.log('-----------------------')
-    console.table(roles)
-  // db.query(`
-  // SELECT roles.id, roles.title, roles.salary, departments.name AS department
-  // FROM roles
-  // LEFT JOIN departments
-  // ON roles.departmentId = departments.id
-  // `, (err, roles) => {
-  //   if (err) { console.log(err) }
-  //   console.log(roles)
+    db.query(`
+    SELECT roles.id, roles.title, roles.salary, departments.name AS department
+    FROM roles
+    LEFT JOIN departments
+    ON roles.departmentId = departments.id
+    `, (err, roles) => {
+      if (err) { console.log(err) }
+      console.table(roles)
+        mainMenu()
   })
-    mainMenu()
-  
+ 
 }
 
-mainMenu()
-// db.query(`
-//   SELECT roles.id, roles.title, roles.salary, departments.name AS department
-//   FROM roles
-//   LEFT JOIN departments
-//   ON roles.departmentId = departments.id
-//   `, (err, roles) => {
-//     if (err) { console.log(err) }
-//     console.log(roles)
-//   })
+const viewEmployees = () => {
+  db.query(`
+  SELECT employees.id, employees.firstName, employees.lastName, roles.title, roles.salary, departments.name AS department, CONCAT(manager.firstName, ' ', manager.lastName) AS manager
+  FROM employees LEFT JOIN roles ON employees.roleId = roles.id
+  LEFT JOIN departments ON roles.departmentId = departments.id
+  LEFT JOIN employees manager on manager.id = employees.managerId
+`, (err, employees) => {
+    if (err) { console.log(err) }
+    console.table(employees)
+      mainMenu()
+  })
+}
 
-// db.query(`
-//   SELECT employees.id, employees.firstName, employees.lastName, roles.title, roles.salary, departments.name AS department, CONCAT(manager.firstName, ' ', manager.lastName) AS manager
-//   FROM employees LEFT JOIN roles ON employees.roleId = roles.id
-//   LEFT JOIN departments ON roles.departmentId = departments.id
-//   LEFT JOIN employees manager on manager.id = employees.managerId
-// `, (err, employees) => {
-//   if (err) { console.log(err) }
-//   console.log(employees)
-// })
+const addDepartment = () => {
+  db.query('SELECT name AS Department FROM departments', (err, departments) => {
+    if (err) { console.log(err) }
+    console.table(departments)
+    mainMenu()
+  })
+}
+
+
+mainMenu()
+
+
