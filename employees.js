@@ -9,11 +9,11 @@ const mainMenu = () => {
     type: 'list',
     name: 'action',
     message: 'What would you like to do?',
-    choices: ['View Database Tables', 'Add to Database', 'Update Employee Role', 'EXIT']
+    choices: ['View Directories', 'Add to Database', 'Update Employee Role', 'EXIT']
   })
     .then(({ action }) => {
       switch (action) {
-        case 'View Database Tables':
+        case 'View Directories':
           viewDataBase()
           break
         case 'Add to Database':
@@ -189,6 +189,8 @@ const addRole = () => {
 const addEmployee = () => {
   db.query('SELECT * FROM roles', (err, roles) => {
     if (err) { console.log(err) }
+    db.query(`SELECT * FROM employees`, (err, employees) => {
+      if (err) { console.log(err) }
     // roles.map(roles =>
     //   console.log(roles.title))
     inquirer.prompt([
@@ -210,7 +212,16 @@ const addEmployee = () => {
           name: `${role.title}`,
           value: role.id
         }))
-      }
+      }, 
+      {
+        type: 'list',
+        name: 'managerId',
+        message: `Who is the employee's manager`,
+        choices: employees.map(employee => ({
+          name: `${employee.firstName} ${employee.lastName}`,
+          value: employee.id
+        }))
+      }, 
     ])
       .then(data => {
 
@@ -220,48 +231,71 @@ const addEmployee = () => {
           --------------------
           ${data.firstName} ${data.lastName} added
           --------------------`)
-          hasManager()
-
+          mainMenu()
         })
 
       })
   })
-}
+})}
 
-const hasManager = () => {
-  db.query('SELECT * FROM employees', (err, data) => {
-    if (err) { console.log(err) }
-    // console.log(data)
-    inquirer.prompt([
-      {
-        type: 'list',
-        name: 'managed',
-        message: 'Does this employee have a manager?',
-        choices: ['Yes', 'No']
-      }
-    ])
-      .then(({ managed }) => {
+// const hasManager = () => {
+//   db.query('SELECT * FROM employees', (err, data) => {
+//     if (err) { console.log(err) }
+//     // console.log(data)
+//     inquirer.prompt([
+//       {
+//         type: 'list',
+//         name: 'managed',
+//         message: 'Does this employee have a manager?',
+//         choices: ['Yes', 'No']
+//       }
+//     ])
+//       .then(({ managed }) => {
 
 
-        switch (managed) {
-          case 'No':
-            mainMenu()
-            break
-          case 'Yes':
-            addManager()
-        }
-      }
-      )
-  }
-  )
-}
+//         switch (managed) {
+//           case 'No':
+            
+//             mainMenu()
+//             break
+//           case 'Yes':
+//             addManager()
+//         }
+//       }
+//       )
+//   }
+//   )
+// }
+
+// const addManager = () => {
+//   db.query('SELECT * FROM employees', (err, managerSearch) => {
+//     if (err) { console.log(err) }
+//     console.log(managerSearch)
+//     inquirer.prompt([
+//       {
+//         type: 'list',
+//         name: 'managerId',
+//         message: `What is the manager's name?`,
+//         choices: managerSearch.map(manager => ({
+//           name: `${manager.firstName} ${manager.lastName}`,
+//           value: manager.id
+//         })
+//           )
+//       }
+//     ])
+//       .then(data => {
+//         console.log(data)
+//       })
+//     })}
+
+
 
 const updateEmployeeRole = () => {
-  db.query(`SELECT employees.firstName, employees.lastName, roles.title, roles.id AS newRoleId
-  FROM employees 
-  LEFT JOIN roles 
-  ON employees.roleId = roles.id `, (err, employees) => {
+  db.query(`SELECT * FROM employees`, (err, employees) => {
     if (err) { console.log(err) }
+  db.query(`SELECT * FROM roles`, (err, roles) => {
+      if (err) { console.log(err) }
+      // console.log(roles)
 
     inquirer.prompt([
       {
@@ -277,14 +311,14 @@ const updateEmployeeRole = () => {
         type: 'list',
         name: 'roleId',
         message: `What is the employee's new role?`,
-        choices: employees.map(employee => ({
-          name: `${employee.title}`,
-          value: employee.newRoleId
+        choices: roles.map(role => ({
+          name: `${role.title}`,
+          value: role.id
         }))
       }
     ])
-      .then(({ roleId, id }) => {
-        db.query('UPDATE employees SET ? WHERE ?', [{ roleId }, { id }], err => {
+      .then(data => {
+        db.query('UPDATE employees SET ? WHERE ?', [{ roleId: data.roleId }, { id: data.id }], err => {
           if (err) { console.log(err) }
           console.log(`
           -----------------
@@ -295,8 +329,7 @@ const updateEmployeeRole = () => {
       })
       .catch(err => console.log(err))
   })
+})
 }
 
 mainMenu()
-
-
