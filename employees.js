@@ -278,15 +278,18 @@ const updateEmployeeRole = () => {
         name: 'roleId',
         message: `What is the employee's new role?`,
         choices: employees.map(employee => ({
-          name: `${employees.title}`,
-          value: employees.newRoleId
+          name: `${employee.title}`,
+          value: employee.newRoleId
         }))
       }
     ])
-      .then(({ id, price }) => {
-        db.query('UPDATE menu SET ? WHERE ?', [{ price }, { id }], err => {
+      .then(({ roleId, id }) => {
+        db.query('UPDATE employees SET ? WHERE ?', [{ roleId }, { id }], err => {
           if (err) { console.log(err) }
-          console.log('Menu Item Price Updated!')
+          console.log(`
+          -----------------
+          role updated
+          -----------------`)
           mainMenu()
         })
       })
