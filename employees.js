@@ -66,13 +66,13 @@ const addToDataBase = () => {
     .then(({ action }) => {
       switch (action) {
         case 'Add Department':
-          // addDepartment()
+          addDepartment()
           break
         case 'Add Role':
-          // addRole()
+          addRole()
           break
         case 'Add Employee':
-          // addEmployees()
+          addEmployee()
           break
         case 'Return to Main Menu':
           mainMenu()
@@ -90,18 +90,20 @@ const viewDepartments = () => {
   })
 }
 
+
+
 const viewRoles = () => {
-    db.query(`
+  db.query(`
     SELECT roles.id, roles.title, roles.salary, departments.name AS department
     FROM roles
     LEFT JOIN departments
     ON roles.departmentId = departments.id
     `, (err, roles) => {
-      if (err) { console.log(err) }
-      console.table(roles)
-        mainMenu()
+    if (err) { console.log(err) }
+    console.table(roles)
+    mainMenu()
   })
- 
+
 }
 
 const viewEmployees = () => {
@@ -113,19 +115,143 @@ const viewEmployees = () => {
 `, (err, employees) => {
     if (err) { console.log(err) }
     console.table(employees)
-      mainMenu()
-  })
-}
-
-const addDepartment = () => {
-  db.query('SELECT name AS Department FROM departments', (err, departments) => {
-    if (err) { console.log(err) }
-    console.table(departments)
     mainMenu()
   })
 }
 
 
-mainMenu()
+
+const addDepartment = () => {
+  inquirer.prompt([
+    {
+      type: 'input',
+      name: 'name',
+      message: 'What is the name of the new department?'
+    }
+  ])
+    .then(data => {
+      db.query('INSERT INTO departments SET ?', data, err => {
+        if (err) { console.log(err) }
+        console.log(`
+        --------------------
+        ${data.name} department added
+        --------------------`)
+        mainMenu()
+      })
+    })
+}
+
+
+const addRole = () => {
+  db.query('SELECT * FROM departments', (err, departments) => {
+    if (err) { console.log(err) }
+    //   departments.map(departments => 
+    //     console.log(departments.name))
+
+    //   })
+    inquirer.prompt([
+      {
+        type: 'input',
+        name: 'title',
+        message: 'What is the title of the new role?'
+      },
+      {
+        type: 'number',
+        name: 'salary',
+        message: 'What is the salary for this role?'
+      },
+      {
+        type: 'list',
+        name: 'departmentId',
+        message: 'Which department is this role a part of?',
+        choices: departments.map(department => ({
+          name: `${department.name}`,
+          value: department.id
+        }))
+      }
+    ])
+      .then(data => {
+      
+        db.query('INSERT INTO roles SET ?', data, err => {
+          if (err) { console.log(err) }
+          console.log(`
+          --------------------
+          ${data.title} role added
+          --------------------`)
+          mainMenu()
+
+        })
+        
+      })
+    })
+}
+
+const addEmployee = () => {
+  db.query('SELECT * FROM roles', (err, roles) => {
+    if (err) { console.log(err) }
+      // roles.map(roles =>
+      //   console.log(roles.title))
+    inquirer.prompt([
+      {
+        type: 'input',
+        name: 'firstName',
+        message: `What is the employee's first name?`
+      },
+      {
+        type: 'input',
+        name: 'lastName',
+        message: `What is the employee's last name?`
+      },
+      {
+        type: 'list',
+        name: 'roleId',
+        message: `What is the employee's role`,
+        choices: roles.map(role => ({
+          name: `${role.title}`,
+          value: role.id
+        }))
+      }
+    ])
+      .then(data => {
+
+        db.query('INSERT INTO employees SET ?', data, err => {
+          if (err) { console.log(err) }
+          console.log(`
+          --------------------
+          ${data.firstName} ${data.lastName} added
+          --------------------`)
+          hasManager()
+
+        })
+
+      })
+})
+}
+
+const hasManager = () => {
+  db.query('SELECT * FROM employees', (err, data) => {
+    if (err) { console.log(err) }
+    // console.log(data)
+    inquirer.prompt([
+      {
+        type: 'confirm',
+        name: 'hasManager',
+        message: 'Does this employee have a manager?',
+        default: false,
+      }
+    ])
+        .then(({ answer }) => {
+          console.log(name)
+      
+          // switch (action) {
+          //   case 'View Database Tables':
+          //     viewDataBase()
+          //     break
+        })
+      })
+    }
+
+hasManager()
+// mainMenu()
 
 
