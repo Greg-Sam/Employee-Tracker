@@ -20,7 +20,7 @@ const mainMenu = () => {
           addToDataBase()
           break
         case 'Update Employee Role':
-          // updateEmployeeRole()
+          updateEmployeeRole()
           break
         case 'EXIT':
           process.exit()
@@ -171,7 +171,7 @@ const addRole = () => {
       }
     ])
       .then(data => {
-      
+
         db.query('INSERT INTO roles SET ?', data, err => {
           if (err) { console.log(err) }
           console.log(`
@@ -181,16 +181,16 @@ const addRole = () => {
           mainMenu()
 
         })
-        
+
       })
-    })
+  })
 }
 
 const addEmployee = () => {
   db.query('SELECT * FROM roles', (err, roles) => {
     if (err) { console.log(err) }
-      // roles.map(roles =>
-      //   console.log(roles.title))
+    // roles.map(roles =>
+    //   console.log(roles.title))
     inquirer.prompt([
       {
         type: 'input',
@@ -225,7 +225,7 @@ const addEmployee = () => {
         })
 
       })
-})
+  })
 }
 
 const hasManager = () => {
@@ -234,24 +234,66 @@ const hasManager = () => {
     // console.log(data)
     inquirer.prompt([
       {
-        type: 'confirm',
-        name: 'hasManager',
+        type: 'list',
+        name: 'managed',
         message: 'Does this employee have a manager?',
-        default: false,
+        choices: ['Yes', 'No']
       }
     ])
-        .then(({ answer }) => {
-          console.log(name)
-      
-          // switch (action) {
-          //   case 'View Database Tables':
-          //     viewDataBase()
-          //     break
+      .then(({ managed }) => {
+
+
+        switch (managed) {
+          case 'No':
+            mainMenu()
+            break
+          case 'Yes':
+            addManager()
+        }
+      }
+      )
+  }
+  )
+}
+
+const updateEmployeeRole = () => {
+  db.query(`SELECT employees.firstName, employees.lastName, roles.title, roles.id AS newRoleId
+  FROM employees 
+  LEFT JOIN roles 
+  ON employees.roleId = roles.id `, (err, employees) => {
+    if (err) { console.log(err) }
+
+    inquirer.prompt([
+      {
+        type: 'list',
+        name: 'id',
+        message: 'Select the employee you want to change roles for.',
+        choices: employees.map(employee => ({
+          name: `${employee.firstName} ${employee.lastName}`,
+          value: employee.id
+        }))
+      },
+      {
+        type: 'list',
+        name: 'roleId',
+        message: `What is the employee's new role?`,
+        choices: employees.map(employee => ({
+          name: `${employees.title}`,
+          value: employees.newRoleId
+        }))
+      }
+    ])
+      .then(({ id, price }) => {
+        db.query('UPDATE menu SET ? WHERE ?', [{ price }, { id }], err => {
+          if (err) { console.log(err) }
+          console.log('Menu Item Price Updated!')
+          mainMenu()
         })
       })
-    }
+      .catch(err => console.log(err))
+  })
+}
 
-hasManager()
-// mainMenu()
+mainMenu()
 
 
