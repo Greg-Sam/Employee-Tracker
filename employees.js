@@ -185,58 +185,67 @@ const addRole = () => {
       })
   })
 }
-
 const addEmployee = () => {
   db.query('SELECT * FROM roles', (err, roles) => {
     if (err) { console.log(err) }
     db.query(`SELECT * FROM employees`, (err, employees) => {
       if (err) { console.log(err) }
-    // roles.map(roles =>
-    //   console.log(roles.title))
-    inquirer.prompt([
-      {
-        type: 'input',
-        name: 'firstName',
-        message: `What is the employee's first name?`
-      },
-      {
-        type: 'input',
-        name: 'lastName',
-        message: `What is the employee's last name?`
-      },
-      {
-        type: 'list',
-        name: 'roleId',
-        message: `What is the employee's role`,
-        choices: roles.map(role => ({
-          name: `${role.title}`,
-          value: role.id
-        }))
-      }, 
-      {
-        type: 'list',
-        name: 'managerId',
-        message: `Who is the employee's manager`,
-        choices: employees.map(employee => ({
-          name: `${employee.firstName} ${employee.lastName}`,
-          value: employee.id
-        }))
-      }, 
-    ])
-      .then(data => {
-
-        db.query('INSERT INTO employees SET ?', data, err => {
-          if (err) { console.log(err) }
-          console.log(`
+      // roles.map(roles =>
+      //   console.log(roles.title))
+      inquirer.prompt([
+        {
+          type: 'input',
+          name: 'firstName',
+          message: `What is the employee's first name?`
+        },
+        {
+          type: 'input',
+          name: 'lastName',
+          message: `What is the employee's last name?`
+        },
+        {
+          type: 'list',
+          name: 'roleId',
+          message: `What is the employee's role`,
+          choices: roles.map(role => ({
+            name: `${role.title}`,
+            value: role.id
+          }))
+        },
+        {
+          type: 'confirm',
+          name: 'managed',
+          message: 'Does this employee have a manager?'
+        },
+        {
+          type: 'list',
+          name: 'managerId',
+          message: `Who is the employee's manager`,
+          choices: employees.map(employee => ({
+            name: `${employee.firstName} ${employee.lastName}`,
+            value: employee.id
+          })),
+          when: function (res) {
+            return res.managed === true
+          }
+        },
+      ])
+        .then(data => {
+          console.log(data)
+          let { firstName, lastName, roleId, managerId } = data
+          db.query('INSERT INTO employees SET ?', { firstName, lastName, roleId, managerId }, err => {
+            if (err) { console.log(err) }
+            console.log(`
           --------------------
           ${data.firstName} ${data.lastName} added
           --------------------`)
-          mainMenu()
+            // updateEmployeeManager(data.id)
+            mainMenu()
+          })
         })
-
-      })
+    })
   })
-})}
+}
 
 // const hasManager = () => {
 //   db.query('SELECT * FROM employees', (err, data) => {
@@ -255,7 +264,7 @@ const addEmployee = () => {
 
 //         switch (managed) {
 //           case 'No':
-            
+
 //             mainMenu()
 //             break
 //           case 'Yes':
@@ -288,48 +297,51 @@ const addEmployee = () => {
 //       })
 //     })}
 
-
+// const updateEmployeeManager = (receivedId)
+// db.query('UPDATE employees SET ? WHERE ?', [{ roleId: data.roleId }, { id: receivedId }], err => {
+//   if (err) { console.log(err) }
 
 const updateEmployeeRole = () => {
   db.query(`SELECT * FROM employees`, (err, employees) => {
     if (err) { console.log(err) }
-  db.query(`SELECT * FROM roles`, (err, roles) => {
+    db.query(`SELECT * FROM roles`, (err, roles) => {
       if (err) { console.log(err) }
       // console.log(roles)
 
-    inquirer.prompt([
-      {
-        type: 'list',
-        name: 'id',
-        message: 'Select the employee you want to change roles for.',
-        choices: employees.map(employee => ({
-          name: `${employee.firstName} ${employee.lastName}`,
-          value: employee.id
-        }))
-      },
-      {
-        type: 'list',
-        name: 'roleId',
-        message: `What is the employee's new role?`,
-        choices: roles.map(role => ({
-          name: `${role.title}`,
-          value: role.id
-        }))
-      }
-    ])
-      .then(data => {
-        db.query('UPDATE employees SET ? WHERE ?', [{ roleId: data.roleId }, { id: data.id }], err => {
-          if (err) { console.log(err) }
-          console.log(`
+      inquirer.prompt([
+        {
+          type: 'list',
+          name: 'id',
+          message: 'Select the employee you want to change roles for.',
+          choices: employees.map(employee => ({
+            name: `${employee.firstName} ${employee.lastName}`,
+            value: employee.id
+          }))
+        },
+        {
+          type: 'list',
+          name: 'roleId',
+          message: `What is the employee's new role?`,
+          choices: roles.map(role => ({
+            name: `${role.title}`,
+            value: role.id
+          }))
+        }
+      ])
+        .then(data => {
+          db.query('UPDATE employees SET ? WHERE ?', [{ roleId: data.roleId }, { id: data.id }], err => {
+            if (err) { console.log(err) }
+            console.log(`
           -----------------
           role updated
           -----------------`)
-          mainMenu()
+            mainMenu()
+          })
         })
-      })
-      .catch(err => console.log(err))
+        .catch(err => console.log(err))
+    })
   })
-})
 }
 
-mainMenu()
+// mainMenu()
+addEmployee()
