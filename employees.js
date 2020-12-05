@@ -343,5 +343,5 @@ const updateEmployeeRole = () => {
   })
 }
 
-// mainMenu()
-addEmployee()
+mainMenu()
+// addEmployee()
