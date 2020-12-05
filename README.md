@@ -13,7 +13,19 @@
   ## Instalation instructions
   Install node on your system and clone this directory.  Then run npm packages for inquirer, mysql2 and console.table.  After that enter the command node index.js in the terminal and use the menus to navigate.  
   ## Usage description
-  From the main menu, select view directories, add to database or update employee role. From the view directories menu you will be able to view department, role and employee tables. From the add to database menu, you can add new departments, roles and employees.  To change an employees role within the company, use the update employee role option from the main menu.  
+  From the main menu, select view directories, add to database or update employee role.  
+  ![employeeTracker1](https://user-images.githubusercontent.com/71279945/101104785-ca3ccb80-3580-11eb-889f-abd65b38c4b7.PNG)  
+  From the view directories menu you will be able to view department, role and employee tables.  
+![employeeTracker2](https://user-images.githubusercontent.com/71279945/101104786-cad56200-3580-11eb-9831-eb3a4c444cbf.PNG)
+  From the add to database menu, you can add new departments, roles and employees.  
+  ![employeeTracker5](https://user-images.githubusercontent.com/71279945/101104789-cb6df880-3580-11eb-8f78-e79a75729bda.PNG)  
+  
+To change an employees role within the company, use the update employee role option from the main menu.  
+The following images show tables and prompts from the app.  
+
+![employeeTracker3](https://user-images.githubusercontent.com/71279945/101104787-cad56200-3580-11eb-9a6d-dffdb448fdd8.PNG)  
+![employeeTracker4](https://user-images.githubusercontent.com/71279945/101104788-cad56200-3580-11eb-91a6-ccfddb21f93c.PNG)  
+![employeeTracker6](https://user-images.githubusercontent.com/71279945/101104791-cb6df880-3580-11eb-8e46-5a290c542e33.PNG)   
   ## License information
   public domain   
   ## Contributors
